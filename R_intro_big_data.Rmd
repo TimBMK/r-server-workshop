@@ -18,9 +18,11 @@ p.caption {
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,  comment = '')
+knitr::opts_chunk$set(echo = TRUE,  comment = '', warning = FALSE)
 library(tidyverse)
 ```
+
+# R Basics
 
 ## *R*
 
@@ -36,8 +38,6 @@ library(tidyverse)
 -   **R Studio** IDE (*Integrated Development Environment*) ermöglicht u.a. komfortables anlegen von Scripts, Inspektion von Objekten, Öffnen von Help-Files sowie das Anzeigen von Grafiken und Graphen
 -   **RMarkdown** ermöglicht das komfortable anlegen von Dokumentationen, Berichten oder Präsentation (wie dieser hier), die auf R-Code basieren
 
-
-# Programmieren mit *R*
 
 ## R als Taschenrechner
 
@@ -254,6 +254,8 @@ names(beatles_data) # Namen der Spalten
 str(beatles_data) # Struktur des Dataframes
 ```
 
+# Einführung in das *tidyverse*
+
 ## Das Tidyverse
 
 ```{r, eval=F}
@@ -360,7 +362,7 @@ grouped %>% ungroup() %>% summarise(n = n())
 iris %>% filter(Petal.Width > mean(Petal.Width), .by = Species) %>% 
   summarise(n = n())
 ```
-## Gängige Operationen 
+## Gängige Operationen I
 
 **Gruppieren** mit `group_by()` oder dem `.by`-Argument
 
@@ -370,10 +372,9 @@ iris %>% filter(Petal.Width > mean(Petal.Width), .by = Species) %>%
 
 **Zusammenfassen** des Datensatzes mit `summarise()`
 
-
-## Gängige Operationen 
-
 **Auswählen von Variablen** mit `select()`
+
+## Gängige Operationen II
 
 **Auswählen von Reihen** mit `slice()` (Position), `slice_head()`/`slice_tail()` (erste/letzte Reihen), `slice_min()`/`slice_max()` (höchste/niedrigste Variablenwerte), `slice_sample()`(Zufallsstichprobe)
 
@@ -436,4 +437,151 @@ ggplot(iris,
 
 <!-- `?function` oder `help(function)`, z.B. `?summarise`, öffnet die Hifeseite einer Funktion in RStudio -->
 
-## Kontrollstrukturen
+## Übungen
+
+Übungen zum Tidyverse unter https://github.com/TimBMK/r-server-workshop/blob/main/Exercices_basic.Rmd
+
+Alle Workshopmaterialien können via Git in euren Ordner auf dem Server kopiert werden. Dazu folgenden Code im **Terminal** (nicht der R-Console!) eingeben:
+```{r, eval = F}
+git clone https://github.com/TimBMK/r-server-workshop.git
+```
+
+
+## Kontrollstrukturen I: For-Loops
+
+```{r}
+for (row in 1:nrow(beatles_data)){
+  print(paste(beatles_data$name[row], 
+              beatles_data$surname[row], 
+              "was born in", 
+              beatles_data$born[row]))
+}
+```
+
+# Kontrollstukturen
+
+## Kontrollstrukturen I: For-Loops
+
+- iterieren durch alle Elemente eines Objekts (z.B. durch alle Reihen eines Dataframes)
+- flexibel
+- deutlich langsamer als andere Methoden
+- **Nicht für die Erweiterung von Objekten verwenden** (extrem langsam aufgrund von Speicherreallokation)
+- **Nur in Ausnahmefällen verwenden**, z.B. printouts oder beim iterieren über mehrere getrennte Objekte
+
+## Kontrollstrukturen II: Apply-Funktionen
+
+```{r}
+apply(beatles_data, 2, nchar) # Anzahl der Zeichen in jeder Reihe und Spalte
+```
+
+## Kontrollstrukturen II: Apply-Funktionen
+
+- schneller als For-Loops, insb. durch optimierte Speicherallokation
+- Familie an Funktionen, mit optimierten shorthands für unterschiedliche Datentypen: `lapply()` (List), `sapply()` (Vector/Array), `vapply()` (Vector)
+- Anwendung u.U. komplex, insb. durch variierende Ausgabeformate
+- nicht immer die schnellste Lösung
+
+
+## Kontrollstrukturen III: Vektorisierte Funktionen
+
+```{r}
+2024 - beatles_data$born
+```
+
+## Kontrollstrukturen III: Vektorisierte Funktionen
+
+- viele Basisfunktionen sind vektorisiert (+, -, etc.)
+- arbeiten ohne explizite Kontrollfunktionen auf dem gesamten Objekt
+- sehr schnell, Implementation häufig in C
+- **viele tidyverse-Funktionen sind vektorisiert** (z.B. zur Datenmanipulation)
+- nicht alle Probleme mit den gegebenen Funktionen lösbar
+
+
+## Kontrollstrukturen IV: Map-Funktionen
+
+```{r}
+map(beatles_data, nchar)
+```
+
+
+## Kontrollstrukturen IV: Map-Funktionen
+
+- Teil des *tidyverse* (purrr)
+- sehr flexibel
+- vergleichbar mit apply-Funktionen, allerdings vereinheitlichter Output
+- Familie an Funktionen, optimiert für unterschiedlichen Output: `map()` (List), `map_lgl()` (Logical), `map_int()` (Integer), `map_dbl()` (Numerical), `map_chr()` (Character), `map_vec()`(Vektorentypen wie Daten, Faktoren etc.)
+- erweitert durch die `walk()`-Funktion, um `map()` ohne Rückgabe auszuführen (z.B. für printouts oder abspeichern von Daten)
+- idR. nicht so schnell wie vektorisierte Funktionen
+- mit dem *future*-Framework parallelisierbar
+
+
+## Benchmarks
+
+```{r, echo = F}
+
+library(microbenchmark)
+
+set.seed(42)  # Reproduzierbarkeit
+n <- 10000  # Anzahl der Reihen
+example_data <- data.frame(
+  id = 1:n,
+  value = runif(n, min = 1, max = 100)  # Zufallszahlen zwischen 1 und 100
+)
+
+# Funktionen, welche die Zahlenwerte verdoppeln
+
+double_with_loop <- function(data) {
+  result <- data
+  for (i in seq_along(result$value)) {
+    result$value[i] <- result$value[i] * 2
+  }
+  return(result)
+}
+
+double_with_apply <- function(data) {
+  result <- data
+  result$value <- sapply(result$value, function(x) x * 2)
+  return(result)
+}
+
+double_with_map <- function(data) {
+  result <- data
+  result$value <- map_dbl(result$value, ~ .x * 2)
+  return(result)
+}
+
+double_with_dplyr <- function(data) {
+  result <- data %>%
+    mutate(value = value * 2)
+  return(result)
+}
+
+# Vergleich der Methoden
+benchmark_results <- microbenchmark(
+  For_Loop = double_with_loop(example_data),
+  Apply = double_with_apply(example_data),
+  Map = double_with_map(example_data),
+  Dplyr = double_with_dplyr(example_data),
+  times = 3  # Anzahl der Wiederholungen
+)
+```
+
+```{r, echo = F}
+autoplot(benchmark_results) +
+  labs(title = "Performance-Vergleich: For-Loop vs Apply vs Map vs Dplyr",
+       subtitle = "Simple Funktion, welche Zahlenwerte in einem Datensatz mit 10.000 Reihen verdoppelt") +
+  theme_minimal()
+```
+
+
+
+# Effiziente Verarbeitung großer Datenmengen
+
+## Einlesen großer Datenmengen: **vroom**
+
+```{r}
+library(vroom)
+
+
+```
+
