@@ -36,12 +36,6 @@ library(furrr)
 -   Ähnlich wie in *Python* werden in *R* **Funktionen** auf **Objekte** angewendet, um diese zu manipulieren
 
 
-## *R*: weitere Funktionen 
-
--   **R Studio** IDE (*Integrated Development Environment*) ermöglicht u.a. komfortables anlegen von Scripts, Inspektion von Objekten, Öffnen von Help-Files sowie das Anzeigen von Grafiken und Graphen
--   **RMarkdown** ermöglicht das komfortable anlegen von Dokumentationen, Berichten oder Präsentation (wie dieser hier), die auf R-Code basieren
-
-
 ## R als Taschenrechner
 
 ```{r}

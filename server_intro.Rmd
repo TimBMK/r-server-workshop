@@ -1,0 +1,191 @@
+---
+title: 'Der DSL-Server'
+author: "Tim König"
+date: "2024-12-13"
+output:
+  ioslides_presentation:
+    logo: "D:/academicCloud/EPINETZ/logo-hildesheim-rd_gr_fr.png"
+    fig_width: 8
+    fig_height: 4.5
+    highlight: tango
+---
+
+<style>
+p.caption {
+  font-size: 0.6em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,  comment = '', warning = FALSE)
+```
+
+# Der DSL-Server
+
+## Hardware
+
+- AMD Threadripper Pro, 16 Kerne / 32 Threads, 3,9gHz
+- 256gb DDR4 RAM
+- 3,84TB Festplattenspeicher
+- **keine** GPUs (noch?)
+- bisher vor allem im EPINetz-Projekt verwendet
+
+
+## Zugriff
+
+- Zugriff wird derzeit nach Bedarf händisch von Admins gewährt: Tim König; Franziska Ziegler (Vertretung)
+- Zugriff derzeit auf Forschende beschränkt, Öffnung für Lehre denkbar
+- Zugriff benötigt universitätsinternes Netzwerk, entweder aus lokalem Netz oder via VPN (https://www.uni-hildesheim.de/rz/uni-vpn/)
+- Standard Ports sind geschlossen
+- Admins sind in Absprache mit dem RZ für die Sicherheit des Servers zuständig. Sie können notfalls Prozesse abbrechen etc. 
+- Bei Problemen, Fragen oder Bedarfen (z.B. Installation von Programmen) an die Admins wenden!
+
+
+## Zugriffsarten
+
+- RStudio Server (R, Python, Terminal)
+- PuTTY (Terminal)
+- Filezilla (Datenzugriff)
+- weitere Zugriffsarten (Jupyter notebooks, VS Code Integration...) ggf. bei Bedarf möglich
+
+
+# RStudio Server
+
+## R Studio
+-   IDE (*Integrated Development Environment*), ermöglicht u.a. komfortables anlegen von Scripts, Inspektion von Objekten, Öffnen von Help-Files sowie das Anzeigen von Grafiken und Graphen
+-   Neben *R* auch Unterstützung von *Python* via **reticulate**. Siehe: https://rstudio.github.io/reticulate/. Python v3.8.10 ist installiert
+-   **RMarkdown** ermöglicht das komfortable anlegen von Dokumentationen, Berichten oder Präsentation (wie dieser hier), die auf R-Code basieren
+-   Integrierter **Terminal** bietet Zugriff auf einen vollumfänglichen Linux Terminal
+
+
+## RStudio Server Zugriff
+-   Der Zugriff auf RStudio auf dem Server erfolgt bequem über den Browser. Einfach http://147.172.39.50:8787/ in das Adressfeld eingeben
+-   Der Login erfolgt über den Account auf dem Server. Benutzername ist idR. die RZ-Kennung, welche auch in der Mailadresse angegeben ist (z.B.koenigt)
+-   Beim ersten Zugriff: Passwort ändern! Default-Passwort: *changethispasswordnow*
+-   Eine lokale *R* Installation ist **nicht** nötig
+-   Die gesamten Rechenkapazitäten des Servers stehen über RStudio Server zur Verfügung. Alle ausgeführten Operationen laufen auf dem Server
+
+
+## RStudio Server: Erster Zugriff
+
+```{r, echo=FALSE, fig.cap="http://147.172.39.50:8787/", out.height="50%", out.width="50%"}
+knitr::include_graphics("images/rstudio_login.png")
+```
+
+## RStudio Server: Erster Zugriff
+
+```{r, echo=FALSE, out.height="100%", out.width="100%"}
+knitr::include_graphics("images/rstudio_blank.png")
+```
+
+## RStudio Server: Passwort ändern
+
+```{r, echo=FALSE, out.height="100%", out.width="100%"}
+knitr::include_graphics("images/rstudio_terminal.png")
+```
+
+## RStudio Server: Passwort ändern
+
+Im Terminal eingeben:
+```{r, eval = F}
+passwd
+```
+
+Dann erst das alte, dann das neue Passwort eingeben
+
+
+## RStudio anpassen
+```{r, echo=FALSE, out.height="60%", out.width="60%"}
+knitr::include_graphics("images/pane_layout.png")
+```
+
+## RStudio anpassen
+```{r, echo=FALSE, out.height="60%", out.width="60%"}
+knitr::include_graphics("images/appeareance.png")
+```
+
+## RStudio anpassen
+```{r, echo=FALSE, out.height="60%", out.width="60%"}
+knitr::include_graphics("images/code_settings.png")
+```
+
+
+## Nutzung von RSTudio Server
+
+- **Sessions laufen auch bei Logout weiter**, d.h. man kann längeren Code ausführen lassen und sich bedenkenlos (auch aus dem VPN) ausloggen und später prüfen, ob dieser durchgelaufen ist. Zum Beenden der Session "Quit the current R Session" oben rechts betätigen - dann wird R beendet
+- **Keine geteilte Package Library:** Packages müssen von jedem User selbst installiert werden und liegen im R Ordner des Home directories
+- **Eigene Projekte** sollten mitsamt allen relevanten Daten im eigenen Home Ordner (Standard Working Directory in Rstudio nach dem Schema data/username) abgelegt werden
+
+## Nutzung von RSTudio Server
+- **Gemeinsame Projekte** können in geteilten Ordnern abgelegt werden. Bei Bedarf bitte bei den Admins melden!
+- Um auf Ordner außerhalb des eigenen Home Directories zuzugreifen, braucht es das /data-Suffix. z.B. setwd("/data/EPINetz")
+- Die open source Version von RStudio Server erlaubt keine Konfiguration der Ressourcennutzung für R / Python. Das heißt: **Achtet bitte eigenständig auf eine vertretbare Ressourcennutzung!**
+
+
+# Datentransfer
+
+
+
+# Terminal Zugriff
+
+
+
+## Merkzettel Servernutzung
+
+Ein **Merkzettel** zur Nutzung des Servers findet sich unter https://sync.academiccloud.de/index.php/s/Oo7bjZk7SvXbvMM
+
+(Und wird im Nachgang des Workshops versendet)
+
+
+# Github
+
+## Zugriff einrichten
+
+- Zugriff erfolgt über SSH
+- Siehe auch: https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent und https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
+- Benötigt einen Github Account!
+
+## Zugriff einrichten
+
+Im **Terminal** (nicht der *R* Console!):
+
+**SSH-Key generieren** (Emailadresse mit der Github-assoziierten ersetzen). Dadurch wird ein SSH-Key generiert, idR. im user home directory (anpassbar). Passphrase optional, muss dann bei jeder Key-Verwendung eingegeben werden.
+```{r, eval = F}
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+
+Der Pfad des generierten Keys wird ausgegeben:
+
+`Your identification has been saved in ...`
+
+
+## Zugriff einrichten
+
+**Privilegien für den .ssh Ordner anpassen**, so dass nur der Besitzer Zugriff auf die Keys hat (sonst später Fehlermeldung!). Wenn der `.ssh` Ordner nicht im aktuellen working directory ist, den Pfad entsprechend anpassen
+```{r, eval = F}
+chmod -R 700 .ssh
+```
+
+**SSH-Agent aktivieren:**
+```{r, eval = F}
+eval $(ssh-agent)
+```
+
+**Key hinzufügen.** Der Pfad des Keys wurde oben ausgegeben (`Your identification has been saved in ...`). Standardmäßig:
+```{r, eval = F}
+ssh-add .ssh/id_ed25519
+```
+
+
+## Zugriff einrichten
+
+```{r, eval = F}
+cat .ssh/id_ed25519.pub
+```
+
+Public Key ausgeben lassen und Ergebnis aus dem Terminal **kopieren** (markieren, Rechtsklick, kopieren). Dann auf https://github.com/settings/keys einen neuen SSH-Key erstellen, den kopierten Key unter "Key" einfügen und benennen. Fertig!
+
+```{r, echo=FALSE, out.height="80%", out.width="80%"}
+knitr::include_graphics("images/git_ssh.png")
+```
