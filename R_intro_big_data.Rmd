@@ -1,7 +1,7 @@
 ---
-title: ' R & Tidyverse Basics'
+title: 'Big Data in R'
 author: "Tim König"
-date: "2023-03-17"
+date: "2024-12-13"
 output:
   ioslides_presentation:
     logo: "D:/academicCloud/EPINETZ/logo-hildesheim-rd_gr_fr.png"
@@ -20,6 +20,9 @@ p.caption {
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,  comment = '', warning = FALSE)
 library(tidyverse)
+library(vroom)
+library(future)
+library(furrr)
 ```
 
 # R Basics
@@ -140,7 +143,7 @@ nothing <- NULL
 is.na(nothing)
 ```
 
-NULL bezeichnet undefinierte Werte, welche nicht evaluiert werden können. NULL kann kein Teil anderer Datenstrukturen, z.B. Vektoren sein (NULL wird bei der Zuordnung ignoriert). NA kann hingegen Teil anderer Datenstrukturen sein, um fehlende Werte anzuzeigen.
+`NULL` bezeichnet undefinierte Werte, welche nicht evaluiert werden können. `NULL` kann kein Teil anderer Datenstrukturen, z.B. Vektoren sein (`NULL` wird bei der Zuordnung ignoriert). `NA` kann hingegen Teil anderer Datenstrukturen sein, um fehlende Werte anzuzeigen. **Fehlende Werte, z.B. fehlende Beobachtungen sollten immer mit `NA` angegeben weden**
 
 ## Datenstrukturen I: Vektoren
 
@@ -263,8 +266,8 @@ install.packages("tidyverse") # Installation eines Packages
 library(tidyverse) # Laden eines Packages
 ```
 
--   Sammlung an Packages dar, die nach denselben Prinzipien operieren und entsprechend kompatibel sind
--   effiziente und konsistentere Alternative zur Verwendung gängiger R-Basis-Operationen dar, z.B. zur Datenmanipulation oder Visualisierung
+-   Sammlung an Packages, die nach denselben Prinzipien operieren und entsprechend kompatibel sind
+-   effiziente und konsistentere Alternative zur Verwendung gängiger R-Basis-Operationen, z.B. zur Datenmanipulation oder Visualisierung
 -   **eine** Art, R zu verwenden
 -   Häufig finden sich Mischungen des *tidy*-Syntax und des *base*-Syntax
 
@@ -304,7 +307,7 @@ result
 
 ## Vergleich von *Base R* und *Tidyverse*
 
-**Tidyverse: *Pipe* **
+**Tidyverse: *Pipe* (`%>%`)  **
 
 ```{r}
 result <- data %>% 
@@ -315,7 +318,15 @@ result <- data %>%
 result
 ```
 
-## Anwendungsbeispiel Tidyverse: Data Wrangling I
+## Pipes
+
+- Der Shortcut für das Einsetzen einer *Pipe*  ist *strg+shift+m*
+- *R* bietet seit Version 4.1 auch eine eigene *Pipe*, `|>`, welche nicht von dem Tidyverse abhängig ist
+- Unter `Tools / Global Options / Code / Editing / Use native pipe operator` lässt sich festlegen, ob der *R*-eigene *Pipe*-Operator verwendet werden soll
+- *tidyverse* und base *R* Pipes sind größtenteils identisch in ihrer Verwendung, jedoch bietet `%>%` (noch) einige erweiterte Funktionen - siehe https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/
+
+
+## Data Wrangling im Tidyverse:  *dplyr*
 
 Wir wollen die Höchstwerte der Blütenlänge für jede Spezies im *Iris*-Datensatz, wobei nur Exemplare mit überdurchschnittlicher Blütenbreite berücksichtigt werden sollen
 
@@ -326,7 +337,7 @@ iris %>%
   slice_max(Petal.Length, n = 1) # Höchstwerte 
 ```
 
-## Anwendungsbeispiel Tidyverse: Data Wrangling II
+## Data Wrangling im Tidyverse:  *dplyr*
 
 Durschnittliche Blütenbreite pro Spezies
 
@@ -362,7 +373,7 @@ grouped %>% ungroup() %>% summarise(n = n())
 iris %>% filter(Petal.Width > mean(Petal.Width), .by = Species) %>% 
   summarise(n = n())
 ```
-## Gängige Operationen I
+## Gängige Operationen mit *dplyr* I
 
 **Gruppieren** mit `group_by()` oder dem `.by`-Argument
 
@@ -372,22 +383,25 @@ iris %>% filter(Petal.Width > mean(Petal.Width), .by = Species) %>%
 
 **Zusammenfassen** des Datensatzes mit `summarise()`
 
-**Auswählen von Variablen** mit `select()`
-
-## Gängige Operationen II
-
-**Auswählen von Reihen** mit `slice()` (Position), `slice_head()`/`slice_tail()` (erste/letzte Reihen), `slice_min()`/`slice_max()` (höchste/niedrigste Variablenwerte), `slice_sample()`(Zufallsstichprobe)
-
 **Umbenennen** von Variablen mit `rename()`
 
 **Sortieren** nach Variablenwerten mit `arrange()`
+
+
+## Gängige Operationen mit *dplyr* II
+
+**Auswählen von Variablen** mit `select()`
+
+**Auswählen von Reihen** mit `slice()` (Position), `slice_head()`/`slice_tail()` (erste/letzte Reihen), `slice_min()`/`slice_max()` (höchste/niedrigste Variablenwerte), `slice_sample()`(Zufallsstichprobe)
+
+**Zusammenfügen** unterschiedlicher Datensätze mit SQL-like *joins*: `inner_join()`, `left_join()`, `right_join()`, `full_join()`
 
 Siehe auch: https://dplyr.tidyverse.org/articles/dplyr.html
 
 
 ## Visualisierung mit dem Tidyverse: *ggplot2*
 
-ggplot verwendet **+** statt der Pipe ( %\>% )
+ggplot verwendet `+` statt der Pipe `%>%` 
 
 ```{r, eval=F}
 ggplot(iris,
@@ -425,17 +439,6 @@ ggplot(iris,
   )
 ```
 
-<!-- ## Addendum: Was tun, wenn unser Code nicht funktioniert? -->
-
-<!-- **Frag das Internet!** -->
-
-<!-- -   Fehlermeldung suchen auf Google, Duckduckgo... -->
-<!-- -   Nach dem Problem auf <https://stackoverflow.com/> **suchen** oder nach der Lösung **fragen** -->
-<!-- -   Die Seite des Packages aufsuchen: idR. auf github.com - dort unter "Issues" suchen oder fragen, z.B. <https://github.com/tidyverse/dplyr/issues> -->
-
-<!-- **Außerdem:** -->
-
-<!-- `?function` oder `help(function)`, z.B. `?summarise`, öffnet die Hifeseite einer Funktion in RStudio -->
 
 ## Übungen
 
@@ -443,9 +446,20 @@ ggplot(iris,
 
 Alle Workshopmaterialien können via Git in euren Ordner auf dem Server kopiert werden. Dazu folgenden Code im **Terminal** (nicht der R-Console!) eingeben:
 ```{r, eval = F}
-git clone https://github.com/TimBMK/r-server-workshop.git
+git clone git@github.com:TimBMK/r-server-workshop.git
 ```
 
+
+## Addendum: Was tun, wenn unser Code nicht funktioniert?
+
+-   Fehlermeldung suchen auf Google, Duckduckgo...
+-   Nach dem Problem auf <https://stackoverflow.com/> **suchen** oder nach der Lösung **fragen**
+-   Die Seite des Packages aufsuchen: idR. auf github.com - dort unter "Issues" suchen oder fragen, z.B. <https://github.com/tidyverse/dplyr/issues>
+-   LLMs wie ChatGPT *können* Lösungen bieten - aber diese sind nicht immer korrekt (v.a. bei komplexen Problemen)!
+-   `?function` oder `help(function)`, z.B. `?summarise`, öffnet die Hifeseite einer Funktion in RStudio
+
+
+# Kontrollstrukturen
 
 ## Kontrollstrukturen I: For-Loops
 
@@ -458,20 +472,19 @@ for (row in 1:nrow(beatles_data)){
 }
 ```
 
-# Kontrollstukturen
-
 ## Kontrollstrukturen I: For-Loops
 
 - iterieren durch alle Elemente eines Objekts (z.B. durch alle Reihen eines Dataframes)
 - flexibel
 - deutlich langsamer als andere Methoden
-- **Nicht für die Erweiterung von Objekten verwenden** (extrem langsam aufgrund von Speicherreallokation)
+- **Nie für die Erweiterung von Objekten verwenden** (extrem langsam aufgrund von Speicherreallokation)
 - **Nur in Ausnahmefällen verwenden**, z.B. printouts oder beim iterieren über mehrere getrennte Objekte
 
 ## Kontrollstrukturen II: Apply-Funktionen
 
 ```{r}
-apply(beatles_data, 2, nchar) # Anzahl der Zeichen in jeder Reihe und Spalte
+# Was ist die Anzahl der Zeichen in jeder Reihe und Spalte?
+apply(beatles_data, 2, nchar) 
 ```
 
 ## Kontrollstrukturen II: Apply-Funktionen
@@ -499,8 +512,13 @@ apply(beatles_data, 2, nchar) # Anzahl der Zeichen in jeder Reihe und Spalte
 
 ## Kontrollstrukturen IV: Map-Funktionen
 
-```{r}
+Zwei unterschiedliche Schreibweisen (Ergebnis ist identisch):
+
+```{r, eval = F}
 map(beatles_data, nchar)
+```
+```{r}
+beatles_data %>% map(\(var) nchar(var))
 ```
 
 
@@ -573,15 +591,314 @@ autoplot(benchmark_results) +
   theme_minimal()
 ```
 
+## Takeaway: Best practices
 
+- Wenn möglich vektorisierte Funktionen verwenden
+- bei komplexeren Operationen entweder `apply()` oder `map()` verwenden
+- `map()` ist flexibler und Teil des *tidyverse* 
+- for-Loops nur in Ausnahmefällen verwenden, da diese idR. sehr langsam sind
 
 # Effiziente Verarbeitung großer Datenmengen
 
-## Einlesen großer Datenmengen: **vroom**
+## Einlesen großer Datenmengen: *vroom*
+
+- 1.23GB/sec read-in (!)
+- lazy load: Daten werden indiziert, aber erst bei Bedarf geladen
+- keine Änderungen im Code nötig, nur sehr geringe Verlangsamung von Operationen
+- Multithreading (automatische Parallelisierung beim lesen und schreiben)
+
+```{r, echo=FALSE, fig.cap="https://vroom.r-lib.org/; siehe auch: https://vroom.r-lib.org/articles/benchmarks.html", out.height="70%", out.width="70%"}
+knitr::include_graphics("images/vroom_performance.png")
+```
+
+
+## vroom
+
+```{r, eval = F}
+library(vroom)
+```
+
 
 ```{r}
-library(vroom)
+party_comments_january <- vroom("data/party_comments_january.csv")
+```
 
+## vroom
+
+- liest `.csv` und verwandte Formate (z.B. `.tsv`) ein, delimiter kann mit dem `delim`-Argument angepasst werden ("," / ";" / "\\t" / "|"...)
+- kann mehrere Files auf einmal einlesen (z.B. ganze Ordner) -  solange die Spalten übereinstimmen
+- kann beim einlesen bereits Spalten auswählen (`col_select`-Argument) - und unterstützt dabei Hilfsfunktionen wie `starts_with()`
+- nicht direkt Teil des *tidyverse*, aber in Handhabe und Syntax sehr ähnlich
+- kann ebenso Daten exportieren, indem Datensätze aus *R* als `.csv` (o.ä.) abgespeichert werden: `vroom_write()`
+- beim einlesen und schreiben großer Datenmengen *sehr* viel schneller als die Verwendung der *R*-eigenen Formate `.RDS` oder `.RDA`
+
+
+## vroom
+
+**Problem:** .csv und ähnliche Datentypen können für große Datenmengen *sehr* groß werden
+
+**Lösung:** Komprimieren, z.B. als `.gz`, `.zip`
+
+- *vroom* unterstützt das einlesen **und** speichern komprimierter Dateien - ohne weiteren Aufwand!
+- untersützt unterschiedliche Backends via `pipe()`-Funktion, z.B. um mit *pigz* noch schneller große Mengen komprimierter Daten zu schreiben
+
+## vroom
+```{r, eval = F}
+vroom_write(party_comments_january, 
+            "data/party_comments_january.csv.gz")
+
+vroom_write(party_comments_january, 
+            pipe("pigz > data/party_comments_january.csv.gz"))
+
+party_comments_january <- vroom("data/party_comments_january.csv.gz")
+```
+
+Größenunterschiede:
+```{r, echo = F}
+cat(paste0("party_comments_january.csv", ": ", file.size("data/party_comments_january.csv")/1e6, "mb\n"))
+cat(paste0("party_comments_january.csv.gz", ": ", file.size("data/party_comments_january.csv.gz")/1e6, "mb"))
+```
+
+
+**Große Datensätze sollten immer komprimiert, z.B. als `.csv.gz`, gespeichert werden!**
+
+
+## Gotcha: Spaltentypen
+
+Im Unterschied zu den `.RDS` und `.RDA`-Formaten liefern `.csv` und verwandte Formate keine Informationen zu den Datentypen in einer Spalte.
+*vroom* (und vergleichbare Funktionen im Tidyverse) versuchen daher, den Datentyp einer Spalte zu erraten. Das funktioniert häufig und kann mit dem
+`guess_max`-Argument noch verbessert werden, indem die Anzahl Reihen, welche zum raten herangezogen werden, erhöht wird (praktisch, wenn z.B. viele 
+Reihen in einer Spalte fehlende Daten haben). 
+
+```{r, eval = F}
+party_comments_january <- vroom("data/party_comments_january.csv", 
+                                guess_max = 10000)
+```
+
+
+## Gotcha: Spaltentypen
+
+Trotzdem kann es sinnvoll sein, die Spaltentypen händisch zu spezifizieren. Insbesondere **lange numerische IDs**, welche sonst u.U. automatisch als 
+numerischer Datentyp eingelesen und von *R* gerundet werden (z.B. Tweet IDs), sollten als `character` eingelesen werden - sonst kann es zu Rundungsfehlern 
+dazu kommen, dass IDs nicht mehr mit den ursprünglichen Daten übereinstimmen!
+
+```{r, eval = F}
+party_comments_january <- vroom("data/party_comments_january.csv",
+                                col_types = list(video_id = "c",   
+                                                 comment_id = "c"))
+```
+
+**IDs immer als character strings einlesen!**
+
+
+## Noch schneller: *data.table*
+
+*dplyr* ist schnell in der Verarbeitung von Daten, kann aber auch an Grenzen stoßen. Das *data.table* Package bietet hier eine Alternative:
+
+- sehr schnell in der Manipulation von Daten
+- eigene, ebenfalls sehr schnelle Funktionen zum einlesen von Daten
+- idr. Speichereffizient
+
+
+## Noch schneller: *data.table*
+
+Aber:
+
+- eigene, teils komplizierte Syntax - für einige Operationen müssen z.B. *keys* händisch gesetzt werden
+- Operationslogik weicht vom *tidyverse* ab, pipes (%>%) sind bspws. kein Teil von *data.table*
+
+Das *tidyverse* ist insgesamt zugänglicher als *data.table*. Für die Verarbeitung extrem großer Datenmengen oder häufig verwendete Operationen
+(z.B. in eigenen Funktionen) kann *data.table* jedoch die bessere Alternative darstellen.
+
+https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
+
+
+## Parallelisierung 
+
+Wenn komplexe Operationen ausgeführt werden, kann es sinnvoll sein, diese zu parallelisieren, um den Prozess zu beschleunigen:
+
+- Parallelisierung ermöglicht die simultane Ausführung von Operationen auf einem System
+- idR. geschieht dies über die asynchrone Evaluation von Operationen in ausgelagerten Prozessen (multithreading)
+- für einige Packages und Funktionen ist Parallelisierung bereits nativ implementiert (z.B. *vroom*), ihre Zahl nimmt tendenziell zu
+- Parallelisierung birgt Risiken und Kosten, da die verwendeten Daten idR. in die Subprozesse kopiert werden müssen - **eine schlechte Parallelisierung ist häufig langsamer und ressourcenaufwändiger als eine normale (sequenzielle) Verarbeitung!**
+
+
+## Das *future* Framework
+
+Das *future* Package bietet die Möglichkeit, Operationen asynchron, d.h. über mehrere Prozesse verteilt, auszuführen. Es verwendet dazu den `%<-%` Operator und `{}`.
+
+Dies ist z.B. sinnvoll wenn:
+
+- Mehrere rechenintensive Prozesse **unabhängig voneinander** ausgeführt werden sollen
+- Häufig ausgeführte, zeitkritische Prozesse optimiert werden sollen
+- Rechenleistung nur über dezentrale Cluster zur Verfügung steht, d.h. eine Operation über mehrere Rechner veteilt werden muss
+
+
+## Das *future* Framework
+
+Es muss bedacht werden dass:
+
+- Die Ergebnisse einer Operation den anderen parallel ausgeführten Operationen **nicht** zur Verfügung stehen
+- Die Parallelisierung einen Overhead besitzt, da die notwendigen Daten in die Subprozesse kopiert werden müssen - dieser Overhead kann größer sein als der Gewinn!
+
+
+## Das *future* Framework
+
+Ein arbiträres Beispiel (bei dem die Parallelisierung keine Gewinne bringen würde):
+```{r}
+most_video_comment_likes %<-% {
+  party_comments_january %>% 
+    summarise(likes = sum(likeCount), .by = video_id)
+}
+
+most_party_comment_likes %<-% {
+  party_comments_january %>% 
+    summarise(likes = sum(likeCount), .by = party_label)
+}
+```
+
+
+## Das *future* Framework
+
+**Wichtig:** Das Ergebnis wird erst dann aus dem Subprozess zurückgeholt, wenn es aufgerufen wird. D.h. wir sehen Fehlermeldungen erst, wenn wir das Ergebnis brauchen!
+
+```{r}
+error %<-% {
+  nonexistent_object %>% 
+    summarise(likes = sum(likeCount), .by = video_id)
+}
+```
+
+Keine Fehlermeldung beim ausführen der *future*
+
+```{r, error=TRUE}
+error
+```
+
+
+## Das *future* Framework
+
+Das *future* Framework bietet unterschiedliche Parallelisierungsstrategien: 
+
+- *sequential*: sequenzielle Ausführung, d.h. keine Parallelisierung
+- *multisession*: im Hintergrund laufende *R*-Sessions
+- *multicore*: "echte" Parallelisierung über geforkte *R*-Prozesse - diese Option steht unter Windows und in RStudio **nicht** zur Verfügung!
+- *cluster*: externe *R*-Sessions - idR. nur für dezentral verteilte Rechencluster sinnvoll
+
+
+## Das *future* Framework
+
+Die Parallelisierungsstrategie wird **für den gesamten in dieser Session ausgeführten Code** mittels `plan()` festgelegt. Dort wird ebenfalls die Anzahl verwendeter Threads mittels dem `workers`-Argument festgelegt.
+
+```{r, eval=F}
+library(future)
+
+plan(multisession, workers = 8)
+```
+
+**In RStudio sollte für die Parallelisierung eine *multisession* verwendet werden!**
+
+Wenn der Code direkt via Shell auf dem Server ausgeführt wird wird, z.B. mittels `rscript`, ist die Verwendung von *multicore* sinnvoll.
+
+
+## Das *future* Framework
+
+Der folgende Code prüft, ob es sich in der aktuellen Session im eine RStudio-Session handelt und legt die Parallelisierung entsprechend auf *multisession* oder *multicore* fest. Außerdem legt er die Anzahl der verwendeten Threads auf die Hälfte der verfügbaren Threads fest.
+
+```{r}
+
+workers <- availableCores()/2
+
+  if (installr::is.RStudio()){ # Multisession for R Studio Sessions
+    plan(multisession, workers = workers) 
+  } else { # multicore for scripts / non-rstudio processes
+    plan(multicore, workers = workers)
+  }
 
 ```
 
+**Der DSL-Server verfügt über 16 Kerne mit insgesamt 32 Threads. Eine Parallelisierung sollte NIEMALS mehr als 16 Threads beanspruchen!**
+
+
+## Das *future* Framework
+
+**Nachdem die parallelisierten Operationen ausgeführt wurden, sollte die Multisession beendet werden, um Ressourcen zu sparen**
+
+Dazu wird der "Plan" wieder auf sequenziell gesetzt.
+
+```{r}
+plan(sequential)
+```
+
+**Wichtig**: Die Ergebnisse der Subprozesse müssen vorher evauliert (d.i. in die eigentliche R-Umgebung zurückgeholt) werden - sonst gehen sie gemeinsam mit den Subprozessen verloren!
+
+
+## Das *future* Framework
+
+```{r, eval = F}
+workers <- availableCores()/2
+  if (installr::is.RStudio()){ # Multisession for R Studio Sessions
+    plan(multisession, workers = workers) 
+  } else { # multicore for scripts / non-rstudio processes
+    plan(multicore, workers = workers)
+  }
+most_video_comment_likes %<-% {
+  party_comments_january %>% 
+    summarise(likes = sum(likeCount), .by = video_id)
+}
+most_party_comment_likes %<-% {
+  party_comments_january %>% 
+    summarise(likes = sum(likeCount), .by = party_label)
+}
+most_video_comment_likes %>% pull(likes) %>% mean()
+most_party_comment_likes %>% pull(likes) %>% mean()
+plan(sequential)
+```
+
+
+## Das *future* Framework
+
+Das package *furrr* bietet die Möglichkeit, die Map-Funktionen aus *purrr* mit dem *future*-Framework zu parallelisieren
+
+- Die Parallelisierung wird wie bei *future* mittels `plan()` festgelegt
+- Die Funktionen entsprechen den Map-Funktionen von *purrr*, mit dem Zusatz `future_`: `future_map()`, `future_map_int()`,`future_walk()` etc.
+
+
+## Das *future* Framework
+
+*furr*
+
+- Es gibt eine Reihe an Gotchas, u.a. sollte ein Seed für die Generierung von Zufallszahlen mit dem Argument `.options = furrr_options(seed = 123)` festelegt werden (wichtig bei zufälligen Initialisierungen), Dataframes sollten nicht gruppiert sein (Performance!) und die Evaluation von Argumenten operiert leicht anders - siehe: https://furrr.futureverse.org/articles/gotchas.html
+- Die Daten für jeden parallelisierten map-Prozess müssen auf den Subprozess übertragen werden. Um eine ineffiziente Verwendung zu vermeiden, ist die Maximalgröße der übetragbaren Daten limitiert. Diese kann mit `options(future.globals.maxSize)` überschrieben werden. Das sollte jedoch **nur in Ausnahmefällen** passieren!
+
+
+## Das *future* Framework
+
+Beispiel: Durchschnittliche Zeichenanzahl pro Variable
+
+```{r}
+
+plan(multisession, workers = 2)
+
+party_comments_january %>% 
+  ungroup() %>% # ungroup just in case
+  future_map_dbl(\(var) {nchar(var) %>% mean(na.rm = TRUE)})
+
+plan(sequential)
+
+```
+
+
+
+## Verarbeitung *sehr* großer Datenmengen: Datenbanksysteme
+
+Da *R* Daten idR. in den RAM lädt, kann es - je nach System - zu Problemen kommen, wenn für sehr große Datensätze nicht genug RAM zur Verfügung steht.
+Eine Alternative stellen Datenbanksysteme dar, welche entweder lokal oder in einer Cloud aufgesetzt werden und nur mit *R* kommunizieren.
+
+
+## Verarbeitung *sehr* großer Datenmengen: Datenbanksysteme
+- Daten werden nicht direkt in *R* geladen, sondern über SQL o.ä. nur abgerufen
+- Für große Datenmengen häufig performanter und vermeidet RAM Bottlenecks
+- Jedoch kann sich die Verarbeitung der Daten in *R* kompliziert gestalten, da Operationen u.U. angepasst werden müssen
+- Es sollte **gründlich** geprüft werden, ob der Einsatz von Datenbanksystemen nötig ist - oder ob mit anderen Tools (z.B. *vroom* oder *data.table*) nicht eine einfachere Optimierung möglich ist
+- Mögliche Systeme sind z.B. DuckDB, welche lokale und Cloud-basierte Lösungen anbietet und mit *duckplyr* eine *tidyverse* Implementation bietet (https://duckdb.org/2024/04/02/duckplyr.html); *RSQLite*, welches SQL-Funktionen implementiert; oder *RPostgres*, welches Postgres-Implementationen bietet
