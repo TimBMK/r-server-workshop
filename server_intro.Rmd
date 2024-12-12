@@ -54,15 +54,15 @@ knitr::opts_chunk$set(echo = TRUE,  comment = '', warning = FALSE)
 
 ## R Studio
 -   IDE (*Integrated Development Environment*), ermöglicht u.a. komfortables anlegen von Scripts, Inspektion von Objekten, Öffnen von Help-Files sowie das Anzeigen von Grafiken und Graphen
--   Neben *R* auch Unterstützung von *Python* via **reticulate**. Siehe: https://rstudio.github.io/reticulate/. Python v3.8.10 ist installiert
+-   Neben *R* auch Unterstützung von *Python* via *reticulate*. Siehe: https://rstudio.github.io/reticulate/. Python v3.8.10 ist installiert
 -   **RMarkdown** ermöglicht das komfortable anlegen von Dokumentationen, Berichten oder Präsentation (wie dieser hier), die auf R-Code basieren
 -   Integrierter **Terminal** bietet Zugriff auf einen vollumfänglichen Linux Terminal
 
 
 ## RStudio Server Zugriff
--   Der Zugriff auf RStudio auf dem Server erfolgt bequem über den Browser. Einfach http://147.172.39.50:8787/ in das Adressfeld eingeben
+-   Der Zugriff auf RStudio auf dem Server erfolgt bequem **über den Browser*. Einfach http://147.172.39.50:8787/ in das Adressfeld eingeben
 -   Der Login erfolgt über den Account auf dem Server. Benutzername ist idR. die RZ-Kennung, welche auch in der Mailadresse angegeben ist (z.B.koenigt)
--   Beim ersten Zugriff: Passwort ändern! Default-Passwort: *changethispasswordnow*
+-   Beim ersten Zugriff: **Passwort ändern!** Default-Passwort: *changethispasswordnow*
 -   Eine lokale *R* Installation ist **nicht** nötig
 -   Die gesamten Rechenkapazitäten des Servers stehen über RStudio Server zur Verfügung. Alle ausgeführten Operationen laufen auf dem Server
 
@@ -118,24 +118,98 @@ knitr::include_graphics("images/code_settings.png")
 - **Eigene Projekte** sollten mitsamt allen relevanten Daten im eigenen Home Ordner (Standard Working Directory in Rstudio nach dem Schema data/username) abgelegt werden
 
 ## Nutzung von RSTudio Server
+
+- **Best Practice:** Projektstruktur von RStudio nutzen für unterschiedliche Analysen/Projekte nutzen - oben rechts in der Ecke - und diese in je einem eigenen Ordner im Home Directory ablegen
+
+```{r, echo=FALSE, out.height="35%", out.width="35%"}
+knitr::include_graphics("images/rstudio_projects.png")
+```
+
+## Nutzung von RSTudio Server
 - **Gemeinsame Projekte** können in geteilten Ordnern abgelegt werden. Bei Bedarf bitte bei den Admins melden!
-- Um auf Ordner außerhalb des eigenen Home Directories zuzugreifen, braucht es das /data-Suffix. z.B. setwd("/data/EPINetz")
+- Um auf Ordner außerhalb des eigenen Home Directories zuzugreifen, braucht es das /data-Suffix. z.B. `setwd("/data/EPINetz")`
 - Die open source Version von RStudio Server erlaubt keine Konfiguration der Ressourcennutzung für R / Python. Das heißt: **Achtet bitte eigenständig auf eine vertretbare Ressourcennutzung!**
 
 
 # Datentransfer
 
+## FileZilla
+- Kostenfreies Open Source Programm
+- Ermöglicht die komfortable Übertragung von Daten via SSH
+- Download unter https://filezilla-project.org/
+
+## FileZilla
+```{r, echo=FALSE, out.height="80%", out.width="80%"}
+knitr::include_graphics("images/filezilla.png")
+```
+
+## FileZilla
+Konfiguration des Servers im Server Manager
+
+```{r, echo=FALSE, out.height="80%", out.width="80%"}
+knitr::include_graphics("images/filezilla_servermanager.png")
+```
 
 
-# Terminal Zugriff
+# Weitere Anwendungsszenarien
+
+## Aufrufen von R Skripten aus dem Terminal
+- Mit dem Befehl `Rscript` können R Skripte direkt aus dem Terminal aufgerufen werden
+- Nur eine RStudio Session pro User - direkt aufgerufene Skripte sind davon nicht betroffen (d.h. sie "blockieren" die Session nicht)
+- Ein direkter Skript Aufruf kann insb. bei rechenintensiven/langwierigen Operationen sinnvoll sein
+- `Rscript` kann mittels `nice`-Value eine Priorität in der Ressourcenallokation zugewiesen werden
+
+## Aufrufen von R Skripten aus dem Terminal
+**R Skripte müssen vollständig und in sich abgeschlossen sein** 
+
+- Objekte werden nur gespeichert, wenn dies explizit mit `save()`/`vroom_write()`/etc. geschieht. Dies gilt auch für erstellte Graphen, welche z.B. mit `ggsave()` gespeichert werden können
+- alle nötigen libraries müssen installiert sein und im Skript geladen werden 
+- Pfade für Objekte müssen korrekt definiert sein, z.B. muss das working directory entsprechend gesetzt werden (`setwd()`)
+- Fehlermeldungen brechen das gesamte Skript ab
 
 
+## Aufrufen von R Skripten aus dem Terminal
+- Mit `Rscript` aufgerufene Skripte müssen mit `nohup` und `&` von der aktuellen Terminal-Session getrennt werden - sonst bricht das Skript beim schließen des Terminals ab!
+- Output des Skripts wird nur gespeichert, wenn dieser mit `> logname.out` umgeleitet wird. Ansonsten werden keine Fehlermeldungen aus dem Skript angezeigt!
+- Es sollte ein `nice`-Value gesetzt werden (je höher dieser ist, desto niedriger die Priorität bei der Ressourcenverteilung)
 
-## Merkzettel Servernutzung
+## Aufrufen von R Skripten aus dem Terminal
+Beispiel: Das Skript "myfirstscript.R" wird mit einem nice value von 19 (niedrige Priorität) ausgeführt und schreibt den output der R Session (z.B. Fehlermeldungen) in die Datei "scriptlog.out". Nach ausführen des Befehls kann der Terminal geschlossen werden, das Skript läuft einfach weiter.
 
-Ein **Merkzettel** zur Nutzung des Servers findet sich unter https://sync.academiccloud.de/index.php/s/Oo7bjZk7SvXbvMM
+```{r, eval = F}
+nohup nice -19 Rscript 'myfirstscript.R' > 'scriptlog.out' &
+```
 
-(Und wird im Nachgang des Workshops versendet)
+*Hinweis:* der Pfad zu dem aufgerufenen Skript ist relativ. Liegt dieses also bspws. in dem Unterordner `myproject`, müsste der Pfad angepasst werden auf `myproject/myfirstscript.R`. Wenn sich die Datei in einem anderen Ordner befindet als dem gerade im Terminal ausgewählten (idR. das Home Directory) kann auch ein absoluter Pfad angegben werden, z.B. `/data/MyHomeDirectory/myproject/myfirstscript.R`.
+
+## Python Skripte
+
+Analog können auch Python Skripte aufgerufen werden. Dazu wird der Befehl `python3` verwendet, z.B.
+
+```{r, eval = F}
+nohup nice -19 python3 'myfirstscript.py' > 'scriptlog.out' &
+```
+
+
+## Crontab
+- Automatisierung von regelmäßig abgerufenen Skripten (z.B. Web Scrapes)
+- Kann *jeden* Befehl automatisieren, indem es ihn zu einer festgelegten Zeit ausführt, z.B. `Rscript`, `python3`, aber auch backups o.ä.
+- Aufruf mit `crontab -e`, womit der File mit allen *cronjobs* (regelmäßig ausgeführten Befehlen) eines Users aufgerufen wird
+- Diesen File editieren, um ein Skript zu einem festgelegten Zeitpunkt regelmäßig auszuführen
+- Siehe z.B. https://linuxhandbook.com/crontab/ für eine Einführung
+- Crontab nutzt standardmäßig den *vim* Editor, welcher etwas anders funktioniert als gewohnte Editoren. Siehe z.B. https://www.freecodecamp.org/news/vim-beginners-guide/
+
+
+## Zugriff über PuTTY
+
+- für fortgeschrittene Nutzer:innen
+- bietet direkten Terminal-Zugriff ohne RSTudio Overhead
+- Zugriff nur aus dem Uni-Netzwerk (VPN oder vor Ort)
+
+```{r, echo=FALSE, out.height="45%", out.width="45%"}
+knitr::include_graphics("images/putty.png")
+```
+
 
 
 # Github
@@ -189,3 +263,12 @@ Public Key ausgeben lassen und Ergebnis aus dem Terminal **kopieren** (markieren
 ```{r, echo=FALSE, out.height="80%", out.width="80%"}
 knitr::include_graphics("images/git_ssh.png")
 ```
+
+
+
+## Merkzettel Servernutzung
+
+Ein **Merkzettel** zur Nutzung des Servers findet sich unter https://sync.academiccloud.de/index.php/s/Oo7bjZk7SvXbvMM
+
+(Und wird im Nachgang des Workshops versendet)
+
