@@ -898,4 +898,11 @@ Eine Alternative stellen Datenbanksysteme dar, welche entweder lokal oder in ein
 - Für große Datenmengen häufig performanter und vermeidet RAM Bottlenecks
 - Jedoch kann sich die Verarbeitung der Daten in *R* kompliziert gestalten, da Operationen u.U. angepasst werden müssen
 - Es sollte **gründlich** geprüft werden, ob der Einsatz von Datenbanksystemen nötig ist - oder ob mit anderen Tools (z.B. *vroom* oder *data.table*) nicht eine einfachere Optimierung möglich ist
-- Mögliche Systeme sind z.B. DuckDB, welche lokale und Cloud-basierte Lösungen anbietet und mit *duckplyr* eine *tidyverse* Implementation bietet (https://duckdb.org/2024/04/02/duckplyr.html); *RSQLite*, welches SQL-Funktionen implementiert; oder *RPostgres*, welches Postgres-Implementationen bietet
+
+## Verarbeitung *sehr* großer Datenmengen: Datenbanksysteme
+Mögliche Systeme sind z.B. 
+
+- DuckDB, welche lokale und Cloud-basierte Lösungen anbietet und mit *duckplyr* eine *tidyverse* Implementation bietet (https://duckdb.org/2024/04/02/duckplyr.html) 
+- *RSQLite* Package, welches SQL-Funktionen implementiert 
+- *RPostgres* Package, welches Postgres-Implementationen bietet
+- *elastic* Package, welches eine Schnittstelle zu ElasticSearch und darauf basierende Datenbanken bietet
