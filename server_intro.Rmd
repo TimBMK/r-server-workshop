@@ -1,5 +1,5 @@
 ---
-title: 'Der DSL-Server'
+title: 'DSL Serverinfrastruktur'
 author: "Tim König"
 date: "2024-12-13"
 output:

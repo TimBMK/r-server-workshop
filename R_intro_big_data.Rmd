@@ -623,8 +623,11 @@ party_comments_january <- vroom("data/party_comments_january.csv")
 - kann mehrere Files auf einmal einlesen (z.B. ganze Ordner) -  solange die Spalten übereinstimmen
 - kann beim einlesen bereits Spalten auswählen (`col_select`-Argument) - und unterstützt dabei Hilfsfunktionen wie `starts_with()`
 - nicht direkt Teil des *tidyverse*, aber in Handhabe und Syntax sehr ähnlich
+
+## vroom
 - kann ebenso Daten exportieren, indem Datensätze aus *R* als `.csv` (o.ä.) abgespeichert werden: `vroom_write()`
 - beim einlesen und schreiben großer Datenmengen *sehr* viel schneller als die Verwendung der *R*-eigenen Formate `.RDS` oder `.RDA`
+- Aber: **Nicht alle Objekte lassen sich im `.csv`-Format abspeichern!**
 
 
 ## vroom
