@@ -699,7 +699,7 @@ linear_model_gam <- gam(Petal.Width ~ Petal.Length,
 summary(linear_model_gam)
 ```
 
-
+## Lineare Regression
 ```{r, echo=F}
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
   geom_point() +
@@ -742,7 +742,7 @@ random_effects_model <- gam(Petal.Width ~ Petal.Length +
 summary(random_effects_model)
 ```
 
-
+## Linear Mixed Model
 ```{r, echo = F}
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
   geom_point() +
